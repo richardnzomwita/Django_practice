@@ -579,9 +579,8 @@ def list_client(request):
 def edit_client(request, id):
     # Récupérer l'objet étudiant correspondant à l'ID
     client = get_object_or_404(Client, id=id)
-    
+    # kirazira ku modifia project yanjeeeeee
     if request.method == "POST":
-        # Pré-remplir le formulaire avec les données POST pour mise à jour
         client_form_creation = ClientForms(request.POST, instance=client)
 
         if client_form_creation.is_valid():
