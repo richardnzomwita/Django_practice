@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load crispy_forms_tags %}
+{% load static %}
+{% include "_head.html" %}
+
+<head>
+    <title>Liste des Produits</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .search-add-container {
+            display: flex;
+            align-items: center;
+        }
+        .search-form .input-group {
+            width: auto; /* Rendre la largeur automatique */
+            max-width: 400px; /* Limite la largeur maximale */
+        }
+        .search-form input[type="text"] {
+            width: 100%; /* Rendre la largeur à 100% */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .search-form {
+            margin-right: 10px; /* Réduire l'espace entre la barre de recherche et l'icône */
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .update-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #333;
+            font-size: 18px;
+        }
+        .update-btn:hover {
+            color: #007bff; /* Couleur au survol */
+        }
+        .delete-btn:hover {
+            color: #dc3545; /* Couleur au survol */
+        }
+    </style>
+</head>
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        {% include "_sidebar.html" %}
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                {% include "_topbar.html" %}
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <div class="content-wrapper" display :'none' style="border: 1px solid rgb(113, 162, 241);">
+
+                        <form id='fournisseur-form' action="" method="POST">
+                            <!--Ici on ajoute dans form id='fournisseur-form' pour l'utiliser dans le script de java script pour vider le formulaire-->
+                            {% csrf_token %}
+                            <!--Comment afficher les messages d'erreur ou de succes-->
+                            <div class="wrapper">
+                                <br>
+                                {% for message in messages %}
+                                <div class="alert {{message.tags}} alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|safe }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <!--Fin d'affichage de messages-->
+                            <h2>Voici la liste de mes produits</h2>
+
+                            <div class="search-add-container">
+                                <form class="search-form d-none d-sm-inline-block form-inline" method="GET" action="">
+                                    <div class="input-group">
+                                        <input type="text" name="q" class="form-control bg-light border-0 small" placeholder="Rechercher..." aria-label="Search" aria-describedby="basic-addon2" value="{{ request.GET.q }}">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <a href="{% url 'create_product' %}">
+                                    <i class="ri-add-circle-fill" style="font-size: 24px;"></i>
+                                </a>
+                            </div>
+
+                            <div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Id unique</th>
+                                            <th scope="col">Catégorie</th>
+                                            <th scope="col">Produit</th>
+                                            <th scope="col">Lot</th>
+                                            <th scope="col">Expiration</th>
+                                            <th scope="col">Description</th>
+                                            <th scope="col">Quantité en stock</th>
+                                            <th scope="col">Prix unitaire</th>
+                                            <th scope="col">Prix total</th>
+                                            <th scope="col">Pharmacie</th>
+                                            <th scope="col">Seuil alerte</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for produit in inscriptions %}
+                                        <tr>
+                                            <th style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.id }}</th>
+                                            <th style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.categorie }}</th>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.nom }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.lot }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.date_expiration }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.description }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.quantite_en_stock }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.prix_unitaire }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.prix_total }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.pharmacie }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder">{{ produit.seuil_alerte_stock }}</td>
+                                            <td style="font: 17px/1 system-ui, sans-serif; font-weight: bolder" class="actions">
+                                                <a href="{% url 'edit_product' produit.id %}" class="update-btn"><i class="fas fa-edit"></i></a>
+                                                <a href="{% url 'delete_product' produit.id %}" class="delete-btn"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Footer -->
+                            <footer class="sticky-footer bg-white">
+                                <div class="container my-auto">
+                                    <div class="copyright text-center my-auto">
+                                        <span>Copyright &copy; Richard 2024</span>
+                                    </div>
+                                </div>
+                            </footer>
+                            <!-- End of Footer -->
+
+                        </form>
+
+                        <!-- Scripts -->
+                        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNvKyz4dGe/WBu2vnI5lCvbfGx5l3KEX4IW3ri4jTeS/9E5bb57AGgG6EmiC6Ai" crossorigin="anonymous"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGheiCCmCX6kFvELqZ6GnvE5A4Sa58de6W7VR5r2e5PqjFfjaK9U0zkM5M" crossorigin="anonymous"></script>
+                        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+                        <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+                        <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+                        <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+                        <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+                        <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
+                        <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+                        <script src="{% static 'js/demo/chart-pie-demo.js' %}"></script>
+
+                    </div>
+                </div>
+                <!-- End of Page Content -->
+
+            </div>
+            <!-- End of Main Content -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+</body>
+</html>

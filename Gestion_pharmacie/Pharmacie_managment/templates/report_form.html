@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Générer un Rapport</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Générer un Rapport</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="start_date">Date de début</label>
+                <input type="date" class="form-control" name="start_date" required>
+            </div>
+            <div class="form-group">
+                <label for="end_date">Date de fin</label>
+                <input type="date" class="form-control" name="end_date" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Générer</button>
+        </form>
+    </div>
+</body>
+</html>

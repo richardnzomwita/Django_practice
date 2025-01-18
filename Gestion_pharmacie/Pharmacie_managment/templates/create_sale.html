@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load crispy_forms_tags %}
+    {% load custom_filters %}
+    {% load static %}
+    {% include "_head.html" %}  
+  <body id="page-top">
+    <body id="page-top">
+ 
+        <!-- Page Wrapper -->
+        <div id="wrapper">
+    
+          <!-- Sidebar -->
+          {% include "_sidebar.html" %}  
+          <!-- End of Sidebar -->
+    
+          <!-- Content Wrapper -->
+          <div id="content-wrapper" class="d-flex flex-column">
+    
+              <!-- Main Content -->
+              <div id="content">
+    
+                  <!-- Topbar -->
+                {% include "_topbar.html" %}  
+                  
+                  <!-- End of Topbar -->
+    
+                  <!-- Begin Page Content -->
+                  <div class="container-fluid">
+                      <!-- Page Heading -->
+                <div class="content-wrapper" style="border: 1px solid rgb(113, 162, 241);">
+           
+           
+            <form id='fournisseur-form' action="" method="POST"> <!--Ici on ajoute dans form id='fournisseur-form' pour l'utiliser 
+              dans le script de java script pour vider le formulaire-->
+              {% csrf_token %}
+              <!--Comment afficher les messages d'erreur ou de succes-->
+              <div class="wrapper">
+                  <br>
+                  {% for message in messages %}
+                  <div class="alert {{message.tags}} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message|safe }}
+                  </div>
+                  {% endfor %}
+                </div>
+              <!--Fin d'affichage de messages --> 
+
+                <h1>Vente des produits</h1>
+                <div class="col-6">
+                    <div class="col-9">
+                        {{ vente_form_creation.produit|as_crispy_field }}
+                        <p id="available-stock" style="color: red; font-weight: bold;">Quantité disponible : </p>
+                        {{ vente_form_creation.quantite_vendue|as_crispy_field }}
+                        {{ vente_form_creation.prix_unitaire|as_crispy_field }}
+                        {{ vente_form_creation.prix_total|as_crispy_field }}
+                        {{ vente_form_creation.date_vente|as_crispy_field }}
+                        {{ vente_form_creation.client|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="submit" name="create_sale" class="btn btn-primary">Enregistrer Vente</button>
+                    <button type="submit" name="add_to_cart" class="btn btn-success">Ajouter au panier</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Vider</button>
+                </div>
+            </form>
+        </div>
+        
+        <div>
+            <h2>Panier d'Achat</h2>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Produit</th>
+                        <th scope="col">Quantité</th>
+                        <th scope="col">Prix Unitaire</th>
+                        <th scope="col">Prix Total</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if articles_panier %}
+                        {% for article in articles_panier %}
+                            <tr>
+                                <td>{{ article.produit.nom }}</td>
+                                <td>{{ article.quantite }}</td>
+                                <td>{{ article.produit.prix_unitaire }}</td>
+                                <td>{{ article.quantite|multiply:article.produit.prix_unitaire }}</td>
+                                <td>
+                                    <a href="{% url 'remove_from_cart' article.id %}" class="btn btn-danger">Supprimer</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun produit dans le panier.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <div class="mt-3">
+                <h3>Total Panier : 
+                    <span style="font-weight: bold; color: green;">
+                        {{ articles_panier|sum_total_price }}
+                    </span>
+                </h3>
+            </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <button type="submit" name="deliver_cart" class="btn btn-success">Livrer</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>Historique des Ventes</h2>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Produit</th>
+                        <th scope="col">Quantité</th>
+                        <th scope="col">Prix unitaire</th>
+                        <th scope="col">Prix total</th>
+                        <th scope="col">Date de vente</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for creation in inscriptions %}
+                    <tr>
+                        <th style="font-weight: bolder">{{ creation.id }}</th>
+                        <td style="font-weight: bolder">{{ creation.produit }}</td>
+                        <td style="font-weight: bolder">{{ creation.quantite_vendue }}</td>
+                        <td style="font-weight: bolder">{{ creation.prix_unitaire }}</td>
+                        <td style="font-weight: bolder">{{ creation.prix_total }}</td>
+                        <td style="font-weight: bolder">{{ creation.date_vente }}</td>
+                        <td style="font-weight: bolder">{{ creation.client }}</td>
+                        <td>
+                            <a href="{% url 'edit_sale' creation.id %}" class="btn btn-warning btn-sm">Update</a>
+                            <a href="{% url 'delete_sale' creation.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto" >
+                    <span>Copyright &copy; Richard  2024</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+
+        </div>
+          <!-- End of Content Wrapper -->
+
+      </div>
+      <!-- End of Page Wrapper -->
+
+      <!-- Scroll to Top Button-->
+      <a class="scroll-to-top rounded" href="#page-top">
+          <i class="fas fa-angle-up"></i>
+      </a>
+
+      <!-- Logout Modal-->
+      <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="login.html">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNvKyz4dGe/WBu2vnI5lCvbfGx5l3KEX4IW3ri4jTeS/9E5bb57AGgG6EmiC6Ai" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGheiCCmCX6kFvELqZ6GnvE5A4Sa58de6W7VR5r2e5PqjFfjaK9U0zkM5M" crossorigin="anonymous"></script>
+                              
+<!-- Bootstrap core JavaScript-->
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+<!-- Page level plugins -->
+<script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+<script src="{% static 'js/demo/chart-pie-demo.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNvKyz4dGe/WBu2vnI5lCvbfGx5l3KEX4IW3ri4jTeS/9E5bb57AGgG6EmiC6Ai" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGheiCCmCX6kFvELqZ6GnvE5A4Sa58de6W7VR5r2e5PqjFfjaK9U0zkM5M" crossorigin="anonymous"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productInfo = {{ produit_info|safe }};
+            const productField = document.getElementById('id_produit');
+            const quantityField = document.getElementById('id_quantite_vendue');
+            const unitPriceField = document.getElementById('id_prix_unitaire');
+            const totalPriceField = document.getElementById('id_prix_total');
+            const availableStock = document.getElementById('available-stock');
+            const submitButton = document.querySelector('button[name="create_sale"]');
+            const addToCartButton = document.querySelector('button[name="add_to_cart"]');
+
+            function updateProductInfo() {
+                const selectedProductId = productField.value;
+                if (selectedProductId in productInfo) {
+                    const info = productInfo[selectedProductId];
+                    availableStock.innerText = `Quantité disponible : ${info.quantite_disponible}`;
+                    unitPriceField.value = info.prix_unitaire.toFixed(2);
+
+                    if (info.date_expiration && new Date(info.date_expiration) <= new Date()) {
+                        alert("Ce produit a expiré et ne peut pas être vendu.");
+                        submitButton.disabled = true;
+                        addToCartButton.disabled = true;
+                    } else {
+                        submitButton.disabled = false;
+                        addToCartButton.disabled = false;
+                    }
+                } else {
+                    availableStock.innerText = "Aucun produit sélectionné.";
+                    unitPriceField.value = "";
+                    submitButton.disabled = true;
+                    addToCartButton.disabled = true;
+                }
+            }
+
+            function updateTotalPrice() {
+                const unitPrice = parseFloat(unitPriceField.value) || 0;
+                const quantity = parseInt(quantityField.value) || 0;
+                totalPriceField.value = (unitPrice * quantity).toFixed(2);
+            }
+
+            productField.addEventListener('change', updateProductInfo);
+            quantityField.addEventListener('input', updateTotalPrice);
+            updateProductInfo();
+        });
+
+        function resetForm() {
+            const form = document.getElementById("sale-form");
+            form.reset();
+            document.getElementById('available-stock').innerText = "Quantité disponible :";
+            document.getElementById('id_prix_total').value = "";
+        }
+    </script>
+    <!--Script pour vider le formulaire-->
+    <script>
+        function resetForm() {
+            document.getElementById("fournisseur-form").reset();
+            const formElements = document.getElementById("fournisseur-form").elements;
+            for (let i = 0; i < formElements.length; i++) {
+                if (formElements[i].type === "text" || formElements[i].type === "textarea" || formElements[i].type === "number" || formElements[i].type === "date") {
+                    formElements[i].value = "";
+                }
+            }
+        }
+        </script>
+</body>
+</html>
